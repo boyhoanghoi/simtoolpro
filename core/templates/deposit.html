@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light py-3 text-center">
+                <h5 class="mb-0 fw-bold">Nạp tiền qua chuyển khoản</h5>
+            </div>
+            <div class="card-body p-4">
+                
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="mb-4 pb-3 border-bottom border-dashed">
+                            <small class="text-muted d-block mb-1">Ngân hàng</small>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-danger fs-5">{{ bank_name }}</span>
+                                <button class="btn btn-sm btn-light text-primary" onclick="copyText('{{ bank_name }}')">Sao chép</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 pb-3 border-bottom border-dashed">
+                            <small class="text-muted d-block mb-1">Chủ tài khoản</small>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-uppercase">{{ acc_name }}</span>
+                                <button class="btn btn-sm btn-light text-primary" onclick="copyText('{{ acc_name }}')">Sao chép</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 pb-3 border-bottom border-dashed">
+                            <small class="text-muted d-block mb-1">Số tài khoản</small>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary fs-4">{{ acc_no }}</span>
+                                <button class="btn btn-sm btn-light text-primary" onclick="copyText('{{ acc_no }}')">Sao chép</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Nội dung chuyển khoản (Bắt buộc)</small>
+                            <div class="d-flex justify-content-between align-items-center bg-warning bg-opacity-10 p-2 rounded border border-warning">
+                                <span class="fw-bold text-danger">{{ memo }}</span>
+                                <button class="btn btn-sm btn-warning" onclick="copyText('{{ memo }}')">Sao chép</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 text-center border-start">
+                        <h6 class="mb-3">Quét mã QR để nạp nhanh</h6>
+                        <img src="{{ qr_url }}" class="img-fluid border rounded shadow-sm" style="max-width: 250px;">
+                        <p class="small text-muted mt-2 fst-italic">Hệ thống sẽ tự động cộng tiền sau 1-3 phút.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+        alert("Đã sao chép: " + text);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký tài khoản | SIM TOOL PRO</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- STYLE ĐỒNG BỘ VỚI TRANG LOGIN --- */
+        body {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%); /* Màu tím xanh chủ đạo */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+
+        .register-card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); /* Đổ bóng sâu tạo chiều nổi */
+        }
+
+        .form-title {
+            font-weight: 800;
+            color: #2b2b2b;
+            margin-bottom: 5px;
+        }
+
+        /* Tùy chỉnh Input form */
+        .form-control {
+            background: #f8f9fa;
+            border: 1px solid transparent;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            background: white;
+            border-color: #4361ee;
+        }
+
+        /* Label của input */
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Nút Đăng ký */
+        .btn-register {
+            background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            font-weight: 700;
+            border: none;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+        }
+
+        /* Link chuyển trang */
+        .link-switch {
+            color: #4361ee;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .link-switch:hover {
+            color: #3a0ca3;
+            text-decoration: underline;
+        }
+        
+        /* Ẩn bullet point của danh sách lỗi */
+        ul.errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <div class="text-center mb-4">
+            <h3 class="form-title">TẠO TÀI KHOẢN 🚀</h3>
+            <p class="text-muted small">Tham gia hệ thống thuê Sim số 1 thị trường</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} py-2 text-center small rounded-3 border-0 bg-opacity-10 mb-3" 
+                     style="background-color: {% if message.tags == 'error' %}#f8d7da{% else %}#d1e7dd{% endif %}; color: {% if message.tags == 'error' %}#842029{% else %}#0f5132{% endif %};">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="mb-3">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-register">Đăng ký ngay</button>
+        </form>
+
+        <div class="text-center mt-4 pt-3 border-top">
+            <small class="text-muted">Đã có tài khoản?</small> 
+            <a href="{% url 'login' %}" class="link-switch ms-1">Đăng nhập</a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; font-size: 40px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <h5 class="fw-bold">{{ request.user.username }}</h5>
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-user-tag me-1"></i> {{ request.user.first_name|default:"Chưa cập nhật tên" }} <br>
+                    <i class="fas fa-phone me-1"></i> {{ profile.phone_number|default:"Chưa có SĐT" }}
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between text-start mb-2 p-2 rounded bg-light">
+                    <div><small class="text-muted">Số dư</small></div>
+                    <div class="fw-bold text-warning">{{ profile.balance }} đ</div>
+                </div>
+                <div class="d-flex justify-content-between text-start mb-2 p-2 rounded bg-light">
+                    <div><small class="text-muted">Tổng code đã thuê</small></div>
+                    <div class="fw-bold text-primary">{{ total_rented }}</div>
+                </div>
+                <div class="d-flex justify-content-between text-start p-2 rounded bg-light">
+                    <div><small class="text-muted">Lần cuối thuê</small></div>
+                    <div class="fw-bold text-danger">
+                        {% if last_date %}{{ last_date|date:"d/m/Y" }}{% else %}---{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold text-primary">Thông tin tài khoản</h6>
+                <button type="submit" form="updateForm" class="btn btn-primary btn-sm">
+                    <i class="fas fa-save me-1"></i> Cập nhật thông tin
+                </button>
+            </div>
+            <div class="card-body">
+                <form id="updateForm" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Tên đăng nhập</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control-plaintext" value="{{ request.user.username }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Họ tên</label>
+                        <div class="col-sm-9">
+                            {{ form.first_name }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Email</label>
+                        <div class="col-sm-9">
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Số điện thoại</label>
+                        <div class="col-sm-9">
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

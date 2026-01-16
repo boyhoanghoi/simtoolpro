@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-card">
+    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold m-0 text-dark">
+            <i class="fas fa-file-invoice-dollar me-2 text-primary"></i> Lịch sử nạp tiền
+        </h5>
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+            {{ transactions|length }} giao dịch
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 table-hover">
+            <thead class="bg-light bg-opacity-50">
+                <tr class="text-muted small text-uppercase" style="letter-spacing: 0.5px;">
+                    <th class="ps-4 py-3">Thời gian</th>
+                    <th>Số tiền nạp</th>
+                    <th>Số dư sau nạp</th>
+                    <th>Nội dung CK</th>
+                    <th>Ngân hàng</th>
+                    <th class="text-end pe-4">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in transactions %}
+                <tr>
+                    <td class="ps-4">
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold text-dark">{{ item.created_at|date:"H:i" }}</span>
+                            <small class="text-muted" style="font-size: 0.75rem;">{{ item.created_at|date:"d/m/Y" }}</small>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="fw-bold text-success fs-6">
+                            +{{ item.amount }} đ
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="fw-bold text-dark">{{ item.balance_after }} đ</span>
+                    </td>
+
+                    <td>
+                        <span class="badge bg-light text-dark border fw-normal py-2 px-3" style="font-family: monospace; font-size: 0.85rem;">
+                            {{ item.content }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="d-flex align-items-center gap-2">
+                            <i class="fas fa-university text-muted"></i> {{ item.bank_name }}
+                        </span>
+                    </td>
+
+                    <td class="text-end pe-4">
+                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill border border-success border-opacity-10">
+                            <i class="fas fa-check-circle me-1"></i> Thành công
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="opacity-50 mb-3">
+                            <i class="fas fa-wallet fa-3x text-muted"></i>
+                        </div>
+                        <h6 class="text-muted fw-normal">Chưa có giao dịch nạp tiền nào.</h6>
+                        <a href="{% url 'deposit' %}" class="btn btn-sm btn-outline-primary mt-2 rounded-pill px-4">
+                            Nạp ngay
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if transactions %}
+    <div class="p-3 border-top bg-light bg-opacity-25 text-center text-muted small">
+        Hiển thị {{ transactions|length }} giao dịch gần nhất.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'unfold/layouts/base.html' %}
+
+{% block content %}
+<div class="p-8">
+    <h1 class="text-3xl font-bold mb-6">DASHBOARD TEST</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {% for item in kpi %}
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <p class="text-sm text-gray-500 uppercase font-bold">{{ item.title }}</p>
+            <p class="text-3xl font-bold text-blue-600 mt-2">{{ item.metric }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ item.footer }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="font-bold mb-4">Biểu đồ doanh thu</h3>
+        <div class="h-64">
+            <canvas id="chartCheck"></canvas>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        {% include "unfold/helpers/app_list.html" %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('chartCheck');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ charts.0.labels|safe }},
+            datasets: [{
+                label: 'VNĐ',
+                data: {{ charts.0.datasets.0.data|safe }},
+                borderColor: '#2563eb',
+                tension: 0.3
+            }]
+        }
+    });
+</script>
+{% endblock %}

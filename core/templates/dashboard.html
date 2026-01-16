@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* CSS Riêng cho Dashboard */
+    .service-card {
+        background: white; border: none; border-radius: 16px;
+        padding: 20px; position: relative;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: 0.3s; cursor: pointer; border: 1px solid transparent;
+        height: 100%; /* Để các thẻ bằng nhau */
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.15);
+    }
+    .service-icon {
+        width: 50px; height: 50px;
+        background: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+        border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin-bottom: 15px;
+    }
+    .price-badge {
+        background: #e0f2fe; color: #0284c7;
+        padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+    }
+    
+    /* Box chờ tin nhắn 'Cyber' */
+    .waiting-box {
+        background: var(--primary-gradient);
+        color: white; border-radius: 20px; padding: 30px;
+        position: relative; overflow: hidden; display: none;
+        box-shadow: 0 15px 35px rgba(67, 97, 238, 0.4);
+    }
+    .waiting-box::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: rotate 10s linear infinite;
+    }
+    @keyframes rotate { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
+
+    /* Style cho khung thông báo mới */
+    .notice-box {
+        background: rgba(255, 255, 255, 0.8);
+        border-left: 5px solid #4cc9f0; /* Màu xanh ngọc điểm nhấn */
+        border-radius: 12px;
+    }
+</style>
+
+<div id="active-session" class="waiting-box mb-4 text-center">
+    <div style="position: relative; z-index: 2;">
+        <h3 class="fw-bold mb-3"><i class="fas fa-circle-notch fa-spin me-2"></i> <span id="status-text">Đang kết nối nhà mạng...</span></h3>
+        
+        <div class="d-inline-flex align-items-center bg-white bg-opacity-25 rounded-pill px-4 py-2 mb-3 border border-white border-opacity-25">
+            <span class="text-white-50 me-2">Số điện thoại:</span>
+            <span class="fw-bold fs-4" id="current-phone">...</span>
+        </div>
+
+        <div class="mt-3">
+            <div id="otp-display" class="bg-white text-dark d-inline-block px-5 py-3 rounded-3 fw-bold display-4 shadow-lg">---</div>
+        </div>
+        <p class="mt-3 text-white-50 mb-0">Hệ thống đang quét tin nhắn tự động...</p>
+    </div>
+</div>
+
+<div class="glass-card notice-box p-3 mb-4 shadow-sm">
+    <div class="d-flex align-items-start">
+        <div class="me-3 mt-1 text-info">
+            <i class="fas fa-info-circle fa-2x"></i>
+        </div>
+        <div class="text-muted small">
+            <div class="mb-2">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                <span class="text-dark fw-bold">Thuê lại SIM:</span> 
+                Trường hợp cần thuê lại (chỉ lấy được trong thời gian ngắn 15-30p và sim khả dụng trên hệ thống).
+            </div>
+            <div>
+                <i class="fas fa-undo-alt text-danger me-1"></i>
+                <span class="text-dark fw-bold">Hoàn tiền tự động:</span> 
+                Số sau khi mua mà không nhận được code sẽ tự động hoàn số dư sau khi hết thời gian hết hạn (thường là 15 phút hoặc thấp hơn).
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-2 mb-4 d-flex align-items-center px-3">
+    <i class="fas fa-search text-muted me-3"></i>
+    <input type="text" id="searchService" onkeyup="filterServices()" class="form-control border-0 shadow-none py-2" placeholder="Tìm kiếm dịch vụ (Shopee, Facebook, Gmail...)" style="background: transparent;">
+</div>
+
+<div class="row g-3" id="service-list">
+    {% for sv in services %}
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2 service-item">
+        <div class="service-card text-center" onclick="rentNow({{ sv.id }}, {{ sv.display_price }}, '{{ sv.name }}')">
+            <div class="d-flex justify-content-center">
+                <div class="service-icon"><i class="fas fa-bolt"></i></div>
+            </div>
+            <h6 class="fw-bold text-dark service-name mb-2 text-truncate" title="{{ sv.name }}">{{ sv.name }}</h6>
+            <div class="price-badge d-inline-block">{{ sv.display_price }} đ</div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5 text-muted">Không tìm thấy dịch vụ nào.</div>
+    {% endfor %}
+</div>
+
+<script>
+    function filterServices() {
+        let input = document.getElementById('searchService').value.toLowerCase();
+        let items = document.getElementsByClassName('service-item');
+        for (let i = 0; i < items.length; i++) {
+            let name = items[i].querySelector('.service-name').innerText.toLowerCase();
+            items[i].style.display = name.includes(input) ? "" : "none";
+        }
+    }
+
+    function rentNow(serviceId, price, name) {
+        if(!confirm(`Xác nhận thuê ${name} giá ${price}đ?`)) return;
+
+        let sessionBox = document.getElementById('active-session');
+        
+        // Reset giao diện box về trạng thái chờ
+        sessionBox.style.display = 'block';
+        sessionBox.style.background = "linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)";
+        document.getElementById('status-text').innerText = "Đang kết nối nhà mạng...";
+        document.getElementById('otp-display').innerText = "---";
+        document.getElementById('otp-display').style.color = "#212529";
+        
+        sessionBox.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+        let encodedName = encodeURIComponent(name); 
+        fetch(`/rent/${serviceId}/${price}/?name=${encodedName}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                // --- [MỚI] ĐOẠN CODE CẬP NHẬT SỐ DƯ NGAY LẬP TỨC ---
+                let balanceEl = document.querySelector('.balance-amount'); // Tìm thẻ số dư
+                if (balanceEl) {
+                    // 1. Lấy số dư hiện tại (Xóa chữ 'đ' và dấu phẩy để tính toán)
+                    let currentBal = parseInt(balanceEl.innerText.replace(/[^\d]/g, ''));
+                    
+                    // 2. Trừ đi giá tiền vừa thuê
+                    let newBal = currentBal - price;
+                    
+                    // 3. Hiển thị lại số dư mới (Format dấu phẩy cho đẹp)
+                    balanceEl.innerText = newBal.toLocaleString('en-US') + " đ";
+                }
+                // -----------------------------------------------------
+
+                let phone = data.phone.toString();
+                if (!phone.startsWith("0") && !phone.startsWith("84")) phone = "0" + phone;
+                document.getElementById('current-phone').innerText = phone;
+                startOtpLoop(data.req_id);
+            } else { 
+                alert(data.message); 
+                sessionBox.style.display = 'none';
+            }
+        });
+    }
+
+    function startOtpLoop(reqId) {
+        let otpInterval = setInterval(() => {
+            fetch(`/check-otp/?req_id=${reqId}`)
+            .then(res => res.json())
+            .then(data => {
+                let otpDisplay = document.getElementById('otp-display');
+                if(data.status === 'found') {
+                    clearInterval(otpInterval);
+                    otpDisplay.innerText = data.code;
+                    otpDisplay.style.color = "#1cc88a"; // Xanh thành công
+                    document.getElementById('status-text').innerText = "Đã nhận Code thành công!";
+                    
+                    // Hiệu ứng box chuyển màu xanh lá
+                    document.getElementById('active-session').style.background = "linear-gradient(135deg, #1cc88a 0%, #13855c 100%)";
+                    
+                    alert("Có Code: " + data.code);
+                } else if (data.status === 'expired') {
+                    clearInterval(otpInterval);
+                    otpDisplay.innerText = "HỦY";
+                    otpDisplay.style.color = "#e74a3b"; // Đỏ thất bại
+                    document.getElementById('status-text').innerText = "Hết hạn / Đã hoàn tiền";
+                    
+                    // Hiệu ứng box chuyển màu đỏ
+                    document.getElementById('active-session').style.background = "linear-gradient(135deg, #e74a3b 0%, #c0392b 100%)";
+                }
+            });
+        }, 3000);
+    }
+</script>
+{% endblock %}
